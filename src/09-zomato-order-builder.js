@@ -47,4 +47,103 @@
  */
 export function buildZomatoOrder(cart, coupon) {
   // Your code here
+  if (
+    !Array.isArray(cart) ||
+    !cart.length
+  ) {
+    return null;
+  }
+
+  const filteredCart = cart.filter((item) => {
+    if (item.qty > 0) {
+      return item;
+    }
+  });
+
+  const items = filteredCart.map((item) => {
+    const name = item.name;
+    const qty = item.qty;
+    const basePrice = item.price;
+
+    let addonTotal = 0;
+    if (item.hasOwnProperty("addons") && item["addons"].length) {
+
+      addonTotal = item["addons"].reduce((acc, curr) => {
+        const currPrice = Number.parseFloat(
+          curr.split(":")[1]
+        );
+        return acc + currPrice;
+      }, 0);
+    }
+    const itemTotal = (basePrice + addonTotal) * qty;
+
+    return {
+      name,
+      qty,
+      basePrice,
+      addonTotal,
+      itemTotal,
+    };
+  });
+
+
+  const subtotal = items.reduce((acc, item) => {
+    return acc + item["itemTotal"];
+  }, 0);
+
+  let fees = 0;
+
+  if (subtotal < 500) {
+    fees = 30;
+  } else if (subtotal >= 500 && subtotal <= 999) {
+    fees = 15;
+  } else {
+    fees = 0;
+  }
+
+  let deliveryFee = fees;
+
+  const gst = Number.parseFloat(
+    (subtotal * 0.05).toFixed(2)
+  );
+
+  let discount = 0;
+
+  if (
+    coupon !== null &&
+    coupon !== undefined
+  ) {
+    switch (coupon.toUpperCase()) {
+      case "FIRST50":
+        const discountOptions = new Array(150, (subtotal * 0.5));
+        discount = Math.min(...discountOptions);
+        break;
+
+      case "FLAT100":
+        discount = 100;
+        break;
+
+      case "FREESHIP":
+        discount = deliveryFee;
+        deliveryFee = 0;
+        break;
+
+      default:
+    }
+  }
+  let total = Number.parseFloat((subtotal + deliveryFee + gst - discount).toFixed(2));
+  const totalOptions = new Array(total, 0);
+  const grandTotal = Math.max(...totalOptions);
+
+  const zomatoOrder = {
+    items: items,
+    subtotal,
+    deliveryFee,
+    gst,
+    discount,
+    grandTotal,
+  };
+
+  return zomatoOrder;
+
 }

@@ -63,4 +63,89 @@
  */
 export function validateForm(formData) {
   // Your code here
+  const errors = {};
+
+  const nameRaw = formData?.name;
+  const email = formData?.email;
+  const phone = formData?.phone;
+  const ageRaw = formData?.age;
+  const pincode = formData?.pincode;
+  const state = formData?.state ?? "";
+  const agreeTerms = formData?.agreeTerms;
+
+  const name = typeof nameRaw === "string" ? nameRaw.trim() : "";
+
+  if (name.length < 2 || name.length > 50) {
+    errors.name = "Name must be 2-50 characters";
+  }
+
+  if (typeof email !== "string") {
+    errors.email = "Invalid email format";
+  } else {
+    const at = email.indexOf("@");
+    const lastAt = email.lastIndexOf("@");
+    const dotAfter = email.indexOf(".", at + 1);
+    if (at === -1 || at !== lastAt || dotAfter === -1) {
+      errors.email = "Invalid email format";
+    }
+  }
+
+  if (typeof phone !== "string" || phone.length !== 10) {
+    errors.phone = "Invalid Indian phone number";
+  } else {
+    const first = phone[0];
+    if (!(first === "6" || first === "7" || first === "8" || first === "9")) {
+      errors.phone = "Invalid Indian phone number";
+    } else {
+      for (const c of phone) {
+        if (c < "0" || c > "9") {
+          errors.phone = "Invalid Indian phone number";
+          break;
+        }
+      }
+    }
+  }
+
+  let age = ageRaw;
+  if (typeof age === "string") {
+    age = parseInt(age, 10);
+  }
+
+  if (
+    typeof age !== "number" ||
+    isNaN(age) ||
+    !Number.isInteger(age) ||
+    age < 16 ||
+    age > 100
+  ) {
+    errors.age = "Age must be an integer between 16 and 100";
+  }
+
+  if (
+    typeof pincode !== "string" ||
+    pincode.length !== 6 ||
+    pincode.startsWith("0")
+  ) {
+    errors.pincode = "Invalid Indian pincode";
+  } else {
+    for (const c of pincode) {
+      if (c < "0" || c > "9") {
+        errors.pincode = "Invalid Indian pincode";
+        break;
+      }
+    }
+  }
+
+  if (typeof state !== "string" || state.trim().length === 0) {
+    errors.state = "State is required";
+  }
+
+  if (Boolean(agreeTerms) !== true) {
+    errors.agreeTerms = "Must agree to terms";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
 }

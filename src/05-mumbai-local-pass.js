@@ -43,4 +43,61 @@
  */
 export function generateLocalPass(passenger) {
   // Your code here
+  if (
+    passenger === null ||
+    passenger === undefined ||
+    !(Object.prototype === Object.getPrototypeOf(passenger))
+  ) {
+    return "INVALID PASS";
+  }
+
+  const objProperties = new Array("name", "from", "to", "classType");
+
+  for (const property of objProperties) {
+    if (!passenger.hasOwnProperty(property)) {
+      return "INVALID PASS";
+    }
+
+    if (!passenger[property].length) {
+      return "INVALID PASS";
+    }
+  }
+
+  switch (passenger["classType"].toLowerCase()) {
+    case "first":
+      break;
+
+    case "second":
+      break;
+
+    default:
+      return "INVALID PASS";
+  }
+
+  let formattedPass = "MUMBAI LOCAL PASS";
+
+  formattedPass = formattedPass.concat("\n", "---");
+
+  formattedPass = formattedPass.concat("\n", `Name: ${passenger["name"].toUpperCase()}`);
+
+  const fromCharArray = passenger["from"].toLowerCase().split("");
+  fromCharArray[0] = fromCharArray[0].toUpperCase();
+  const fromTitleCase = fromCharArray.join("");
+
+  const toCharArray = passenger["to"].toLowerCase().split("");
+  toCharArray[0] = toCharArray[0].toUpperCase();
+  const toTitleCase = toCharArray.join("");
+
+  formattedPass = formattedPass.concat("\n", `From: ${fromTitleCase}`);
+  formattedPass = formattedPass.concat("\n", `To: ${toTitleCase}`);
+  formattedPass = formattedPass.concat("\n", `Class: ${passenger["classType"].toUpperCase()}`);
+
+  let passId = passenger["classType"][0].toUpperCase();
+  passId = passId.concat("", passenger["from"].slice(0, 3).toUpperCase());
+  passId = passId.concat("", passenger["to"].slice(0, 3).toUpperCase());
+
+  formattedPass = formattedPass.concat("\n", `Pass ID: ${passId}`);
+
+  return formattedPass;
+
 }

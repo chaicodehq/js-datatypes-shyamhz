@@ -42,4 +42,99 @@
  */
 export function generateReportCard(student) {
   // Your code here
+  if (
+    student === undefined ||
+    student === null ||
+    !Object.keys(student).length ||
+    Object.prototype !== Object.getPrototypeOf(student)
+  ) {
+    return null;
+  }
+
+  if (
+    typeof student["name"] !== "string" ||
+    student["name"] === ""
+  ) {
+    return null;
+  }
+
+  if (
+    student["marks"] === undefined ||
+    student["marks"] === null ||
+    !Object.keys(student["marks"]).length ||
+    Object.prototype !== Object.getPrototypeOf(student["marks"])
+  ) {
+    return null;
+  }
+
+
+  for (const marks of Object.values(student["marks"])) {
+    if (
+      typeof marks !== "number" ||
+      marks < 0 ||
+      marks > 100
+    ) {
+      return null;
+    }
+  }
+  const numSubjects = Object.values(student["marks"]).length;
+  const totalMarks = Object.values(student["marks"]).reduce((total, currMark) => total + currMark);
+
+  const percentage = Number.parseFloat(((totalMarks / (numSubjects * 100)) * 100).toFixed(2));
+
+  const highestSubjectMarks = Math.max(...Object.values(student["marks"]));
+  const lowestSubjectMarks = Math.min(...Object.values(student["marks"]));
+
+  const highestSubject = Object.keys(student["marks"]).find((key) => student["marks"][key] === highestSubjectMarks);
+  const lowestSubject = Object.keys(student["marks"]).find((key) => student["marks"][key] === lowestSubjectMarks);
+  const passedSubjects = [];
+
+  for (const [sub, marks] of Object.entries(student["marks"])) {
+
+    if (marks >= 40) {
+      passedSubjects.push(sub);
+    }
+  }
+
+  const failedSubjects = [];
+
+  for (const [sub, marks] of Object.entries(student["marks"])) {
+
+    if (marks < 40) {
+      failedSubjects.push(sub);
+    }
+  }
+
+  const subjectCount = Object.values(student["marks"]).length;
+
+  let grade = "";
+
+  if (percentage >= 90) {
+    grade = "A+";
+  } else if (percentage >= 80 && percentage < 90) {
+    grade = "A";
+  } else if (percentage >= 70 && percentage < 80) {
+    grade = "B";
+  } else if (percentage >= 60 && percentage < 70) {
+    grade = "C";
+  } else if (percentage >= 40 && percentage < 60) {
+    grade = "D";
+  } else {
+    grade = "F"
+  }
+
+  const ReportCard = {
+    name: student["name"],
+    totalMarks,
+    percentage,
+    grade,
+    highestSubject,
+    lowestSubject,
+    passedSubjects,
+    failedSubjects,
+    subjectCount,
+  }
+
+  return ReportCard;
+
 }

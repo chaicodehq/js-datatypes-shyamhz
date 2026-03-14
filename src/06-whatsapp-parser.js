@@ -40,4 +40,81 @@
  */
 export function parseWhatsAppMessage(message) {
   // Your code here
+  if (
+    typeof message !== "string" ||
+    message === null ||
+    message === undefined
+  ) {
+    return null;
+  }
+
+  if (message.indexOf('-') < 0) {
+    return null;
+  }
+  const firstColonIndex = message.indexOf(':');
+
+  if (message.indexOf(':', firstColonIndex + 1) < 0) {
+    return null;
+  }
+
+  let messageHyphenItems = message.split(" - ");
+
+  const dateTime = messageHyphenItems[0].trim();
+  const messageBody = messageHyphenItems[1].trim();
+
+  const dateTimeArr = dateTime.split(", ");
+  const date = dateTimeArr[0].trim();
+  const time = dateTimeArr[1].trim();
+
+  const messageBodyArr = messageBody.split(": ");
+  const sender = messageBodyArr[0].trim();
+  const msgBody = messageBodyArr[1].trim();
+
+  const msgWordsArray = msgBody.toLowerCase().split(" ");
+  const filteredMsgWordsArray = msgWordsArray.filter((word) => word.length);
+
+  const wordCount = filteredMsgWordsArray.length;
+  const text = msgBody;
+
+  const funnyWords = new Array("😂", ":)", "haha");
+  const sentimentalWords = new Array("❤", "love", "pyaar");
+
+  let statementIsFunny = false;
+  let statementIsSentimental = false;
+
+  let sentiment = "";
+
+  for (const word of funnyWords) {
+    if (filteredMsgWordsArray.includes(word)) {
+      statementIsFunny = true;
+      sentiment = "funny";
+      break;
+    }
+  }
+
+  if (!statementIsFunny) {
+    for (const word of sentimentalWords) {
+      if (filteredMsgWordsArray.includes(word)) {
+        statementIsSentimental = true;
+        sentiment = "love";
+        break;
+      }
+    }
+  }
+
+  if (!statementIsSentimental && !statementIsFunny) {
+    sentiment = "neutral";
+  }
+
+  const parsedObject = {
+    date,
+    time,
+    sender,
+    text,
+    wordCount,
+    sentiment,
+  };
+
+
+  return parsedObject;
 }
